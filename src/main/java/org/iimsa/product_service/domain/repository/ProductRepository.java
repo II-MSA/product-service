@@ -7,4 +7,6 @@ import org.iimsa.product_service.domain.model.Product;
 public interface ProductRepository {
     Product save(Product product);
     Optional<Product> findById(UUID productId);
+
+    void deleteProductById(UUID productId);
 }

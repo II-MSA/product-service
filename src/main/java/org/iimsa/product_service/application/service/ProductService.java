@@ -12,12 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ProductService {
     private final ProductRepository productRepository;
     private final CompanyProvider companyProvider;
     private final RoleCheck roleCheck;
 
-    @Transactional
     public UUID createProduct(String productName, UUID companyId) {
 
         Product product = Product.builder()
@@ -32,12 +32,12 @@ public class ProductService {
         return result.getId();
     }
 
+    @Transactional(readOnly = true)
     public Product getProduct(UUID productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다. ID: " + productId));
     }
 
-    @Transactional
     public void updateProduct(UUID productId, UpdateProductCommand command) {
         // 1. 기존 데이터 조회
         Product product = productRepository.findById(productId)
@@ -51,5 +51,9 @@ public class ProductService {
                 companyProvider,
                 roleCheck
         );
+    }
+
+    public void deleteProductById(UUID productId) {
+        productRepository.deleteProductById(productId);
     }
 }

@@ -21,4 +21,9 @@ public class ProductRepositoryImpl implements ProductRepository {
     public Optional<Product> findById(UUID productId) {
         return jpaProductRepository.findById(productId);
     }
+
+    @Override
+    public void deleteProductById(UUID productId) {
+        jpaProductRepository.deleteById(productId);
+    }
 }
