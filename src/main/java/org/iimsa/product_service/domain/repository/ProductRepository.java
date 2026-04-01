@@ -5,4 +5,5 @@ import org.iimsa.product_service.domain.model.Product;
 
 public interface ProductRepository {
     Product save(Product product);
+    Product findById(UUID productId);
 }

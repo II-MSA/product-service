@@ -2,8 +2,6 @@ package org.iimsa.product_service.application.service;
 
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.iimsa.product_service.application.dto.command.CreateProductCommand;
-import org.iimsa.product_service.domain.service.CompanyInfoResult;
 import org.iimsa.product_service.domain.service.CompanyProvider;
 import org.iimsa.product_service.domain.model.Product;
 import org.iimsa.product_service.domain.repository.ProductRepository;
@@ -31,10 +29,9 @@ public class ProductService {
         Product result = productRepository.save(product);
 
         return result.getId();
+    }
 
-//        Product product = command.toEntity();
-//        CompanyInfoResult companyInfo = companyProvider.getCompany(command.companyId());
-//        Product savedProduct = productRepository.save(product);
-//        return savedProduct.getId();
+    public Product getProduct(UUID productId) {
+        return productRepository.findById(productId);
     }
 }
