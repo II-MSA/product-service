@@ -1,9 +1,17 @@
 package org.iimsa.product_service.domain.model;
 
-import jakarta.persistence.*;
-import java.util.List;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.iimsa.product_service.domain.service.CompanyProvider;
 import org.iimsa.product_service.domain.service.RoleCheck;
 
@@ -60,6 +68,16 @@ public class Product {
     public void updateInfo(String productName, UUID companyId, CompanyProvider companyProvider, RoleCheck roleCheck) {
         // 수정 권한 체크
         checkAuthority(roleCheck);
+
+        // 1. 상품명이 들어온 경우에만 수정
+        if (productName != null && !productName.isBlank()) {
+            this.productName = productName;
+        }
+
+        // 2. 업체 ID가 들어온 경우에만 Associate 객체 새로 생성 (기존값 유지 로직)
+        if (companyId != null) {
+            this.associate = new Associate(companyId, companyProvider);
+        }
 
         this.productName = productName;
         this.associate = new Associate(companyId, companyProvider);
