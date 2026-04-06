@@ -43,11 +43,16 @@ dependencyManagement {
     }
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 dependencies {
     implementation 'com.iimsa:common:2.0-SNAPSHOT'
 
     /**여기에 각자 의존성 작성*/
 
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui'
     // Querydsl APT
     annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
     annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
