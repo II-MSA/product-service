@@ -12,8 +12,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.iimsa.product_service.domain.service.CompanyProvider;
-import org.iimsa.product_service.domain.service.RoleCheck;
+import org.iimsa.product_service.domain.security.RoleCheck;
 
 
 // 재고 필드가 없고, 재고는 허브 상품(p_hub_product)에서 관리한다.
@@ -37,12 +36,14 @@ public class Product {
     private Associate associate;
 
     @Builder
-    public Product(String productName, UUID companyId, CompanyProvider companyProvider, RoleCheck roleCheck) {
-        // 등록권한 체크
+    public Product(
+            String productName,
+            Associate associate,
+            RoleCheck roleCheck) {
+        // 권한체크
         checkAuthority(roleCheck);
-
         this.productName = productName;
-        this.associate = new Associate(companyId, companyProvider);
+        this.associate = associate;
     }
 
     /**
@@ -50,13 +51,10 @@ public class Product {
      */
     public static Product create(
             String productName,
-            UUID companyId,
-            CompanyProvider companyProvider
-    ) {
+            Associate associate) {
         return Product.builder()
                 .productName(productName)
-                .companyId(companyId)
-                .companyProvider(companyProvider)
+                .associate(associate)
                 .build();
     }
 
@@ -65,34 +63,55 @@ public class Product {
     // 아래 코드는 이후 제거 or 수정 or 추가 가능성 있음
     // ===========================
 
-    public void updateInfo(String productName, UUID companyId, CompanyProvider companyProvider, RoleCheck roleCheck) {
-        // 수정 권한 체크
+    // 상품 정보 전체 수정
+    public void updateProduct(String productName, Associate associate, RoleCheck roleCheck) {
+
         checkAuthority(roleCheck);
 
-        // 1. 상품명이 들어온 경우에만 수정
+        // 상품명이 들어온 경우 수정
         if (productName != null && !productName.isBlank()) {
             this.productName = productName;
         }
 
-        // 2. 업체 ID가 들어온 경우에만 Associate 객체 새로 생성 (기존값 유지 로직)
-        if (companyId != null) {
-            this.associate = new Associate(companyId, companyProvider);
+        // 업체 정보가 들어온 경우 수정
+        if (associate != null) {
+            this.associate = associate;
         }
     }
 
+    // 상품명만 수정
+    public void updateProductName(String productName, RoleCheck roleCheck) {
+        checkAuthority(roleCheck);
+
+        roleCheck.hasRole(UserType.MASTER);
+        if (productName != null && !productName.isBlank()) {
+            this.productName = productName;
+        }
+    }
+
+    // 소속만 수정
+    public void updateAssociate(Associate associate, RoleCheck roleCheck) {
+        // 본인 담당 업체인 지 체크
+        checkAuthority(roleCheck);
+        if (associate != null) {
+            this.associate = associate;
+        }
+    }
+
+    /**
+     * MASTER, HUB_MANAGER, COMPANY_MANAGER 중 하나라도 있으면 허용
+     */
     private void checkAuthority(RoleCheck roleCheck) {
-        if (roleCheck.hasRole("MASTER")) { // MASTER 관리자는 권한 체크 필요 없음
-            return;
+        if (roleCheck == null) {
+            throw new RuntimeException("권한 확인을 위한 RoleCheck 객체가 필요합니다.");
         }
 
-        if (!(roleCheck.hasRole("COMPANY_MANAGER") && roleCheck.isMyCompany(this.associate.getCompany().getId()))) {
-            throw new RuntimeException("처리할 권한이 없습니다.");
+        boolean isAuthorized = roleCheck.hasRole(UserType.MASTER) ||
+                roleCheck.hasRole(UserType.HUB_MANAGER) ||
+                roleCheck.hasRole(UserType.COMPANY_MANAGER);
+
+        if (!isAuthorized) {
+            throw new RuntimeException("상품 처리에 필요한 권한이 없습니다.");
         }
     }
-
-    // 업체나 허브가 변경되는 경우를 위한 로직
-//    public void changeAffiliation(UUID companyId, UUID hubId) {
-//        this.companyId = companyId;
-//        this.hubId = hubId;
-//    }
 }

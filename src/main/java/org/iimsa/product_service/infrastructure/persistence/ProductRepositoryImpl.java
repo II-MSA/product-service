@@ -5,6 +5,8 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.iimsa.product_service.domain.model.Product;
 import org.iimsa.product_service.domain.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -25,5 +27,10 @@ public class ProductRepositoryImpl implements ProductRepository {
     @Override
     public void deleteProductById(UUID productId) {
         jpaProductRepository.deleteById(productId);
+    }
+
+    @Override
+    public Page<Product> findAll(Pageable pageable) {
+        return jpaProductRepository.findAll(pageable);
     }
 }

@@ -1,9 +1,10 @@
 package org.iimsa.product_service.infrastructure.client;
 
-import jakarta.ws.rs.InternalServerErrorException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.FallbackFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
 @Component
@@ -11,9 +12,10 @@ public class CompanyClientFallbackFactory implements FallbackFactory<CompanyClie
     @Override
     public CompanyClient create(Throwable e) {
         return CompanyId -> {
-            log.error("[Hub Service Fallback] ID: {} 조회 중 장애 발생. 사유: {}", CompanyId, e.getMessage(), e);
+            log.error("[Company Service Fallback] ID: {} 조회 중 장애 발생. 사유: {}", CompanyId, e.getMessage(), e);
 
-            throw new InternalServerErrorException("Company Service API 요청 처리 실패, 잠시 후 다시 시도해주세요.");
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
+                    "Company Service API 요청 처리 실패, 잠시 후 다시 시도해주세요.", e);
         };
     }
 }

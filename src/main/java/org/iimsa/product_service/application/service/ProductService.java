@@ -2,11 +2,16 @@ package org.iimsa.product_service.application.service;
 
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.iimsa.product_service.application.dto.command.CreateProductCommand;
 import org.iimsa.product_service.application.dto.command.UpdateProductCommand;
-import org.iimsa.product_service.domain.service.CompanyProvider;
+import org.iimsa.product_service.domain.model.Associate;
 import org.iimsa.product_service.domain.model.Product;
 import org.iimsa.product_service.domain.repository.ProductRepository;
-import org.iimsa.product_service.domain.service.RoleCheck;
+import org.iimsa.product_service.domain.security.RoleCheck;
+import org.iimsa.product_service.domain.service.CompanyProvider;
+import org.iimsa.product_service.presentation.dto.response.ListProductResponseDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,42 +23,68 @@ public class ProductService {
     private final CompanyProvider companyProvider;
     private final RoleCheck roleCheck;
 
-    public UUID createProduct(String productName, UUID companyId) {
+    public UUID createProduct(CreateProductCommand command) {
+        Associate associate = Associate.from(command.companyId(), companyProvider);
 
-        Product product = Product.builder()
-                .productName(productName)
-                .companyId(companyId)
-                .companyProvider(companyProvider)
-                .roleCheck(roleCheck)
-                .build();
-
-        Product result = productRepository.save(product);
-
-        return result.getId();
+        Product product = Product.create(
+                command.productName(),
+                associate
+        );
+        return productRepository.save(product).getId();
     }
 
     @Transactional(readOnly = true)
     public Product getProduct(UUID productId) {
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다. ID: " + productId));
+        return findProductById(productId);
     }
 
     public void updateProduct(UUID productId, UpdateProductCommand command) {
-        // 1. 기존 데이터 조회
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다. ID: " + productId));
+        Product product = findProductById(productId);
 
-        // 2. 도메인 모델에 수정 위임
-        // command 내부의 필드가 null이어도 엔티티에서 방어 로직이 작동함
-        product.updateInfo(
+        Associate associate = Associate.from(command.companyId(), companyProvider);
+        product.updateProduct(
                 command.productName(),
-                command.companyId(),
-                companyProvider,
+                associate,
                 roleCheck
         );
     }
 
+    public void updateProductName(UUID productId, UpdateProductCommand command) {
+        Product product = findProductById(productId);
+
+        String productName = command.productName();
+        product.updateProductName(productName, roleCheck);
+    }
+
+    public void updateAssociate(UUID productId, UpdateProductCommand command) {
+        Product product = findProductById(command.companyId());
+
+        Associate associate = Associate.from(command.companyId(), companyProvider);
+        product.updateAssociate(associate, roleCheck);
+    }
+
     public void deleteProductById(UUID productId) {
         productRepository.deleteProductById(productId);
+    }
+
+    private Product findProductById(UUID productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다. ID: " + productId));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ListProductResponseDto> searchProducts(Pageable pageable) {
+        // 1. 레포지토리에서 Page<Product>를 가져옵니다.
+        Page<Product> productPage = productRepository.findAll(pageable);
+
+        // 2. .map()을 사용하여 각 Product 엔티티를 ListProductResponseDto로 변환합니다.
+        return productPage.map(product -> new ListProductResponseDto(
+                product.getId(),
+                product.getProductName(),
+                product.getAssociate().getCompany().getCompanyId(),  // Associate 객체 구조에 맞춰 필드 호출
+                product.getAssociate().getCompany().getCompanyName(), // 만약 Associate에 회사명이 있다면 호출
+                product.getAssociate().getHub().getHubId(),
+                product.getAssociate().getHub().getHubName()
+        ));
     }
 }

@@ -4,20 +4,40 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.util.UUID;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.iimsa.product_service.domain.service.CompanyProvider;
+import org.iimsa.product_service.domain.service.dto.CompanyData;
 
 @Getter
 @ToString
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Hub {
     @Column(length = 36, name = "hub_id", nullable = false)
-    private UUID id;
+    private UUID hubId;
 
     @Column(length = 80, name = "hub_name", nullable = false)
-    private String name;
+    private String hubName;
+
+
+    protected Hub(UUID hubId, CompanyProvider provider) {
+        if (hubId == null) {
+            throw new IllegalArgumentException("hubId cannot be null");
+        }
+        if (provider == null) {
+            throw new IllegalArgumentException("provider cannot be null");
+        }
+        this.hubId = hubId;
+        CompanyData companyData = provider.getCompany(hubId);
+        if (companyData == null) {
+            throw new IllegalArgumentException("companyData cannot be null");
+        }
+        this.hubName = companyData.hubName();
+    }
+
+    protected static Hub from(UUID hubId, CompanyProvider companyProvider) {
+        return new Hub(hubId, companyProvider);
+    }
 }
