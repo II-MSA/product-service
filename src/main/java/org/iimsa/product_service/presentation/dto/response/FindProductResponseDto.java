@@ -20,10 +20,10 @@ public record FindProductResponseDto(
         return new FindProductResponseDto(
                 product.getId(),
                 product.getProductName(),
-                associate.getCompany().getId(),
-                associate.getCompany().getName(),
-                associate.getHub().getId(),
-                associate.getHub().getName()
+                associate.getCompany().getCompanyId(),
+                associate.getCompany().getCompanyName(),
+                associate.getHub().getHubId(),
+                associate.getHub().getHubName()
         );
     }
 }
