@@ -2,6 +2,8 @@ server:
   port: 5160
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
   application:
     name: product-service
   config:
@@ -34,3 +36,17 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: ${EUREKA_SERVER_URL:http://localhost:3101/eureka/}
+
+openapi:
+  service:
+    url: ${OPENAPI_URL:http://localhost:5160}
+
+springdoc:
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  swagger-ui:
+    path: /swagger-ui.html
+    # 접속 후 API 그룹이 잘 보이도록 설정
+    operations-sorter: method
+  api-docs:
+    path: /api-docs
