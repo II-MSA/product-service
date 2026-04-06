@@ -37,7 +37,7 @@ public class Product {
     private Associate associate;
 
     @Builder
-    public Product(String productName, UUID companyId, CompanyProvider  companyProvider, RoleCheck roleCheck) {
+    public Product(String productName, UUID companyId, CompanyProvider companyProvider, RoleCheck roleCheck) {
         // 등록권한 체크
         checkAuthority(roleCheck);
 
@@ -78,9 +78,6 @@ public class Product {
         if (companyId != null) {
             this.associate = new Associate(companyId, companyProvider);
         }
-
-        this.productName = productName;
-        this.associate = new Associate(companyId, companyProvider);
     }
 
     private void checkAuthority(RoleCheck roleCheck) {

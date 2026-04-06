@@ -11,7 +11,6 @@ import org.iimsa.product_service.presentation.dto.response.CreateProductResponse
 import org.iimsa.product_service.presentation.dto.response.FindProductResponseDto;
 import org.iimsa.product_service.presentation.dto.response.UpdateProductResponseDto;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -30,7 +29,7 @@ public class ProductController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CreateProductResponseDto save(CreateProductRequestDto requestDto) {
+    public CreateProductResponseDto save(@RequestBody CreateProductRequestDto requestDto) {
 
         UUID productId = productService.createProduct(requestDto.productName(), requestDto.companyId());
 
@@ -39,7 +38,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public FindProductResponseDto findById(@PathVariable("id") UUID productId) {
-        Product product =  productService.getProduct(productId);
+        Product product = productService.getProduct(productId);
         return FindProductResponseDto.from(product);
     }
 
@@ -59,8 +58,8 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteById(@PathVariable("id") UUID productId) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable("id") UUID productId) {
         productService.deleteProductById(productId);
-        return new ResponseEntity(HttpStatus.OK);
     }
 }

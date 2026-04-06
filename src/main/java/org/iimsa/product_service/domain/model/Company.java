@@ -12,12 +12,12 @@ import lombok.ToString;
 @Getter
 @ToString
 @Embeddable
-@NoArgsConstructor(access = AccessLevel.PRIVATE) // 기술 제약
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 기술 제약
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class Company {
-    @Column(length=36, name="company_id", nullable = false)
+    @Column(length = 36, name = "company_id", nullable = false)
     private UUID id;
 
-    @Column(length=80, name="company_name", nullable = false)
+    @Column(length = 80, name = "company_name", nullable = false)
     private String name;
 }

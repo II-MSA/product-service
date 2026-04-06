@@ -13,7 +13,7 @@ import org.iimsa.product_service.domain.service.CompanyProvider;
 @Getter
 @ToString
 @Embeddable
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Associate {
     @Embedded
     private Company company;
@@ -22,7 +22,7 @@ public class Associate {
     private Hub hub;
 
     protected Associate(UUID companyId, CompanyProvider provider) {
-        if (companyId == null || provider == null)  {
+        if (companyId == null || provider == null) {
             throw new IllegalArgumentException("업체 ID 및 처리 Provider는 필수 항목 입니다.");
         }
 
