@@ -57,7 +57,7 @@ public class ProductService {
     }
 
     public void updateAssociate(UUID productId, UpdateProductCommand command) {
-        Product product = findProductById(command.companyId());
+        Product product = findProductById(productId);
 
         Associate associate = Associate.from(command.companyId(), companyProvider);
         product.updateAssociate(associate, roleCheck);

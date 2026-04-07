@@ -22,22 +22,25 @@ public class Hub {
     private String hubName;
 
 
-    protected Hub(UUID hubId, CompanyProvider provider) {
+    protected Hub(UUID companyId, CompanyProvider provider) {
         if (hubId == null) {
             throw new IllegalArgumentException("hubId cannot be null");
         }
         if (provider == null) {
             throw new IllegalArgumentException("provider cannot be null");
         }
-        this.hubId = hubId;
-        CompanyData companyData = provider.getCompany(hubId);
+        CompanyData companyData = provider.getCompany(companyId);
         if (companyData == null) {
             throw new IllegalArgumentException("companyData cannot be null");
         }
+        this.hubId = companyData.hubId();
         this.hubName = companyData.hubName();
+        if (this.hubId == null) {
+            throw new IllegalArgumentException("This company does not have an assigned hub");
+        }
     }
 
-    protected static Hub from(UUID hubId, CompanyProvider companyProvider) {
-        return new Hub(hubId, companyProvider);
+    protected static Hub from(UUID companyId, CompanyProvider companyProvider) {
+        return new Hub(companyId, companyProvider);
     }
 }

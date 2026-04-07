@@ -89,11 +89,11 @@ public class ProductController {
     @PreAuthorize("hasAnyRole('MASTER', 'HUB_MANAGER', 'COMPANY_MANAGER')")
     @Operation(summary = "상품 소속 수정", description = "상품이 속한 업체(Company) 정보를 수정합니다.")
     public UpdateProductResponseDto updateAssociate(
-            @PathVariable("id") UUID id,
+            @PathVariable("id") UUID productId,
             @RequestBody UpdateProductRequestDto requestDto) {
         UpdateProductCommand command = UpdateProductCommand.from(requestDto);
-        productService.updateAssociate(id, command);
-        return new UpdateProductResponseDto(id);
+        productService.updateAssociate(productId, command);
+        return new UpdateProductResponseDto(productId);
     }
 
     @DeleteMapping("/{id}")

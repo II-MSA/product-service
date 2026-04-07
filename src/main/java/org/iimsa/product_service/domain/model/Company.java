@@ -23,14 +23,14 @@ public class Company {
 
     protected Company(UUID companyId, CompanyProvider provider) {
         if (companyId == null) {
-            throw new IllegalArgumentException("receiverId is null");
+            throw new IllegalArgumentException("companyId is null");
         }
         if (provider == null) {
             throw new IllegalArgumentException("provider is null");
         }
         this.companyId = companyId;
         CompanyData companyData = provider.getCompany(companyId);
-        if (companyData == null) {
+        if (companyData.companyName() == null || companyData.companyName().isBlank()) {
             throw new IllegalArgumentException("companyData is null");
         }
         this.companyName = companyData.companyName();
