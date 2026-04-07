@@ -52,7 +52,8 @@ public class Product extends BaseEntity {
      */
     public static Product create(
             String productName,
-            Associate associate) {
+            Associate associate,
+            RoleCheck roleCheck) {
         return Product.builder()
                 .productName(productName)
                 .associate(associate)
@@ -66,7 +67,6 @@ public class Product extends BaseEntity {
 
     // 상품 정보 전체 수정
     public void updateProduct(String productName, Associate associate, RoleCheck roleCheck) {
-
         checkAuthority(roleCheck);
 
         // 상품명이 들어온 경우 수정
@@ -84,7 +84,6 @@ public class Product extends BaseEntity {
     public void updateProductName(String productName, RoleCheck roleCheck) {
         checkAuthority(roleCheck);
 
-        roleCheck.hasRole(UserType.MASTER);
         if (productName != null && !productName.isBlank()) {
             this.productName = productName;
         }

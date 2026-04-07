@@ -28,7 +28,8 @@ public class ProductService {
 
         Product product = Product.create(
                 command.productName(),
-                associate
+                associate,
+                roleCheck
         );
         return productRepository.save(product).getId();
     }
@@ -78,13 +79,19 @@ public class ProductService {
         Page<Product> productPage = productRepository.findAll(pageable);
 
         // 2. .map()을 사용하여 각 Product 엔티티를 ListProductResponseDto로 변환합니다.
-        return productPage.map(product -> new ListProductResponseDto(
-                product.getId(),
-                product.getProductName(),
-                product.getAssociate().getCompany().getCompanyId(),  // Associate 객체 구조에 맞춰 필드 호출
-                product.getAssociate().getCompany().getCompanyName(), // 만약 Associate에 회사명이 있다면 호출
-                product.getAssociate().getHub().getHubId(),
-                product.getAssociate().getHub().getHubName()
-        ));
+        return productPage.map(product -> {
+            var associate = product.getAssociate();
+            if (associate == null || associate.getCompany() == null || associate.getHub() == null) {
+                throw new IllegalStateException("상품의 연관 정보가 불완전합니다. ID: " + product.getId());
+            }
+            return new ListProductResponseDto(
+                    product.getId(),
+                    product.getProductName(),
+                    associate.getCompany().getCompanyId(),
+                    associate.getCompany().getCompanyName(),
+                    associate.getHub().getHubId(),
+                    associate.getHub().getHubName()
+            );
+        });
     }
 }
