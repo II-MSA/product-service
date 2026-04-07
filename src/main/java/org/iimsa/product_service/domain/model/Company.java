@@ -21,22 +21,19 @@ public class Company {
     @Column(length = 80, name = "company_name", nullable = false)
     private String companyName;
 
-    protected Company(UUID companyId, CompanyProvider provider) {
+    protected Company(UUID companyId, CompanyData companyData) {
         if (companyId == null) {
             throw new IllegalArgumentException("companyId is null");
         }
-        if (provider == null) {
-            throw new IllegalArgumentException("provider is null");
+        if (companyData == null || companyData.companyName() == null || companyData.companyName().isBlank()) {
+            throw new IllegalArgumentException("companyData is null or invalid");
         }
         this.companyId = companyId;
-        CompanyData companyData = provider.getCompany(companyId);
-        if (companyData.companyName() == null || companyData.companyName().isBlank()) {
-            throw new IllegalArgumentException("companyData is null");
-        }
         this.companyName = companyData.companyName();
     }
 
     public static Company from(UUID companyId, CompanyProvider companyProvider) {
-        return new Company(companyId, companyProvider);
+        CompanyData companyData = companyProvider.getCompany(companyId);
+        return new Company(companyId, companyData);
     }
 }

@@ -19,8 +19,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
 
-    private final String PREFIX = "/api/v1/products";
-
     @Bean
     public OpenAPI openAPI(@Value("${openapi.service.url}") String url) {
         return new OpenAPI()
@@ -43,7 +41,7 @@ public class SwaggerConfig {
             // 기존 paths에 prefix 붙여서 추가
             Map<String, PathItem> original = new LinkedHashMap<>(paths);
             for (String path : original.keySet().toArray(new String[0])) {
-                String prefixed = PREFIX + path;
+                String prefixed = path;
                 if (!paths.containsKey(prefixed)) {
                     PathItem item = original.get(path);
                     paths.addPathItem(prefixed, item);
@@ -52,9 +50,6 @@ public class SwaggerConfig {
 
             // 실제 엔드포인트는 제거하고 게이트웨이를 통한 엔드포인트만 노출
             original.keySet().forEach(s -> {
-                if (!s.startsWith(PREFIX)) {
-                    paths.remove(s);
-                }
             });
         };
     }

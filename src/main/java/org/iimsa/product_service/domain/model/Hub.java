@@ -22,25 +22,19 @@ public class Hub {
     private String hubName;
 
 
-    protected Hub(UUID companyId, CompanyProvider provider) {
-        if (hubId == null) {
-            throw new IllegalArgumentException("hubId cannot be null");
-        }
-        if (provider == null) {
-            throw new IllegalArgumentException("provider cannot be null");
-        }
-        CompanyData companyData = provider.getCompany(companyId);
+    protected Hub(CompanyData companyData) {
         if (companyData == null) {
             throw new IllegalArgumentException("companyData cannot be null");
         }
+        if (companyData.hubId() == null) {
+            throw new IllegalArgumentException("이 업체에 할당된 허브가 없습니다.");
+        }
         this.hubId = companyData.hubId();
         this.hubName = companyData.hubName();
-        if (this.hubId == null) {
-            throw new IllegalArgumentException("This company does not have an assigned hub");
-        }
     }
 
     protected static Hub from(UUID companyId, CompanyProvider companyProvider) {
-        return new Hub(companyId, companyProvider);
+        CompanyData companyData = companyProvider.getCompany(companyId);
+        return new Hub(companyData);
     }
 }

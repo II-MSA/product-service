@@ -28,11 +28,11 @@ public class Associate {
 
         CompanyData companyData = companyProvider.getCompany(companyId);
         if (companyData == null) {
-            throw new IllegalArgumentException("업체를 찾을수 없습니다. ID: " + companyId.toString());
+            throw new IllegalArgumentException("업체를 찾을수 없습니다. ID: " + companyId);
         }
 
-        this.company = new Company(companyId, companyProvider);
-        this.hub = new Hub(companyData.hubId(), companyProvider);
+        this.company = new Company(companyId, companyData);   // CompanyData 재사용
+        this.hub = new Hub(companyData);                      // CompanyData 재사용, hubId가 아닌 companyData 그대로 전달
     }
 
     public static Associate from(UUID companyId, CompanyProvider companyProvider) {
@@ -41,10 +41,16 @@ public class Associate {
 
     // 외부에 제공할 편의 메서드 (이전 답변의 권한 체크에서 활용)
     public UUID getCompanyId() {
+        if (this.company == null) {
+            return null;
+        }
         return this.company.getCompanyId();
     }
 
     public UUID getHubId() {
+        if (this.hub == null) {
+            return null;
+        }
         return this.hub.getHubId();
     }
 }

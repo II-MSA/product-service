@@ -12,13 +12,13 @@ public record ListProductResponseDto(
         @Schema(description = "상품명", example = "부산 어묵")
         String productName,
 
-        @Schema(description = "소속 업체 식별자(UUID)", example = "a1b2c3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6")
+        @Schema(description = "소속 업체 식별자(UUID)", example = "a1b2c3d4-e5f6-7890-abcd-1234567890ab")
         UUID companyId,
 
         @Schema(description = "소속 업체명", example = "부산 어묵 생산업체")
         String companyName,
 
-        @Schema(description = "관리 허브 식별자(UUID)", example = "b2c3d4e5-f6g7-8h9i-0j1k-l2m3n4o5p6q7")
+        @Schema(description = "관리 허브 식별자(UUID)", example = "b2c3d4e5-f6a7-8901-bcde-234567890abc")
         UUID hubId,
 
         @Schema(description = "관리 허브명", example = "부산 허브")
